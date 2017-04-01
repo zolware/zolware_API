@@ -1,7 +1,6 @@
 appdirs==1.4.3
 click==6.7
 cycler==0.10.0
-filterpy==0.1.5
 #matplotlib==2.0.0
 mccabe==0.6.1
 numpy==1.12.1
