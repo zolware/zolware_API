@@ -4,8 +4,8 @@ Zolware API
 
 .. image:: https://travis-ci.org/zolware/zolware_API.svg?branch=master
     :target: https://travis-ci.org/zolware/zolware_API
-.. image:: https://codecov.io/github/zolware/zolware_API/coverage.svg?branch=master
-    :target: https://codecov.io/github/zolware/zolware_API/coverage.svg?branch=master
+.. image:: https://codecov.io/gh/zolware/zolware_API/coverage.svg?branch=master
+    :target: https://codecov.io/gh/zolware/zolware_API
 
 - Licensed under MIT
 
