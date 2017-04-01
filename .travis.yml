@@ -1,0 +1,21 @@
+language: python
+python:
+  - "3.5"
+dist: trusty
+sudo: required
+
+install:
+  # command to install dependencies
+  - pip install --upgrade wheel setuptools pip
+  - pip install -r requirements/development.txt
+script:
+  - mkdir -p build && cd build
+  - cmake ..
+  - make
+  - ctest --verbose
+  - pip install -e .
+  - zolware -v
+  - py.test --cov=zolware tests/
+  - python setup.py test
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

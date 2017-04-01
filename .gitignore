@@ -1,0 +1,14 @@
+build/
+*.so
+*.c
+.DS_Store
+.cache/
+*.egg
+*.eggs
+*.egg-info
+__pycache__/
+.tox/
+.coverage
+*.sublime-workspace
+*.sublime-project
+references/

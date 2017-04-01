@@ -1,0 +1,5 @@
+[run]
+include = zolware/*
+omit = *tests*, *command_line.py, *filterpy*
+#plugins =
+    #pytest-cov
