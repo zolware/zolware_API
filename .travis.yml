@@ -18,4 +18,4 @@ script:
   - py.test --cov=zolware tests/
   - python setup.py test
 after_success:
-   - codecov --file coverage/lcov.info --disable search
+   - codecov
