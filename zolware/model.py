@@ -2,45 +2,25 @@
 import os
 import json
 import numpy as np
-from filterpy.common import Q_discrete_white_noise
 from filterpy.kalman import predict
 from filterpy.kalman import update
 from filterpy.kalman import KalmanFilter
 from .utils import DATA_DIR, CONFIG_FILE_NAME, Utils
 from .state import State
+from .sensors import Sensors
+from .process import Process
+from .measurement import Measurement
 
 
 class Model:
     """The model class
     """
     def __init__(self):
+        self.sensors = Sensors()
         self.loadSettings()
-        # timestep
-        self.dt = 0.1
-        # dimension state vector
-        self.dim_x = 2
-        # dimension measurements vector (number of sensors)
-        self.dim_z = 1
-
-        # Process
-        # process model
-        self.F = np.array([[1, self.dt],
-                           [0, 1]])
-        # process noise
-        self.Q = Q_discrete_white_noise(dim=2, dt=1., var=2.35)
-        # Control model function
-        self.B = 0.
-        # control input
-        self.u = 0
-
-        # Measurements
-        # measurement function
-        self.H = np.array([[1., 0.]])
-        # measurement covariance
-        self.R = np.array([[5.]])
-        # measurements
-        self.exact, self.z = Utils.generateData(0, 0, 50, self.dt)
-
+        self.process = Process(self.sensors,
+                               self.state)
+        self.measurement = Measurement(self.sensors)
 
     def loadSettings(self):
         """Load settings from JSON file.
@@ -58,15 +38,16 @@ class Model:
     def compute(self):
         """Compute
         """
-        kf = KalmanFilter(dim_x=self.dim_x, dim_z=self.dim_z)
+        kf = KalmanFilter(dim_x=self.state.dim, dim_z=self.sensors.dim)
         kf.x = self.state.x  # location and velocity
         kf.P[:] = self.state.P  # covariance matrix 
-        kf.F = self.F  # state transition matrix
-        kf.Q[:] = self.Q
-        kf.H = self.H  # Measurement function
-        kf.R[:] = self.R  # measurement uncertainty
+        kf.F = self.process.F  # state transition matrix
+        kf.Q[:] = self.process.Q
+        kf.H = self.measurement.H  # Measurement function
+        kf.R[:] = self.measurement.R  # measurement uncertainty
         xs , cov = [], []
-        for z in self.z:
+        zs = self.sensors.signals[0]
+        for z in zs:
             kf.predict()
             kf.update(z)
             xs.append(kf.x)

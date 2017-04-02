@@ -18,7 +18,8 @@ class State:
         else:
             raise ValueError("The state vector dimension "+
                              "can't be defined.")
-        if Utils.checkDimension(dim):
+        message = 'The dimension must be a positive integer.'
+        if Utils.checkPositiveInteger(dim, message):
             self.dim = dim
             self.x = np.array(x0)
             self.P = np.array(P0)

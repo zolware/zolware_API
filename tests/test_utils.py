@@ -18,16 +18,16 @@ class TestUtils(unittest.TestCase):
         """
         pass
 
-    def test_checkDimension(self):
+    def test_checkPositiveInteger(self):
         """Test the checkDimension method.
         """
-        message = 'The dimension must be a positive integer.'
+        message = 'The entered value must be a positive integer.'
         with six.assertRaisesRegex(self, ValueError,
                                    message):
-            self.u.checkDimension("a")
+            self.u.checkPositiveInteger("a")
         with six.assertRaisesRegex(self, ValueError,
                                    message):
-            self.u.checkDimension(-2)
+            self.u.checkPositiveInteger(-2)
         with six.assertRaisesRegex(self, ValueError,
                                    message):
-            self.u.checkDimension(0.4)
+            self.u.checkPositiveInteger(0.4)

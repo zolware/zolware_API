@@ -17,6 +17,7 @@ from . import __version__
 BASE_DIR = Path(__file__).ancestor(2)
 DATA_DIR = BASE_DIR.child("data")
 CONFIG_FILE_NAME = BASE_DIR.child('config.json')
+SIG_FILE_NAME = DATA_DIR.child('data.txt')
 
 """DEFAULT_SETTINGS:
 """
@@ -33,18 +34,54 @@ class Utils:
         pass
 
     @staticmethod
-    def generateData(z_var, process_var, count=1, dt=1.):
-        "returns track, measurements 1D ndarrays"
-        x, vel = 0., 1.
+    def generateSignal(z_var, process_var, count=1, dt=1., save=False):
+        """save a txt file containing the time series and
+           returns the exact and simulated signals.
+               :param z_var: sensor variance
+               :param process_var: process variance
+               :param count: length of the time series
+               :param dt: uniform timestep
+               :param save: True if saving a file
+               :returns: The exact and simulated signals
+        """
+        x, xdot = 0., 1.
         z_std = math.sqrt(z_var) 
         p_std = math.sqrt(process_var)
         xs, zs = [], []
         for _ in range(count):
-            v = vel + (randn() * p_std * dt)
-            x += v*dt        
+            v = xdot + (randn() * p_std * dt)
+            x += v*dt       
             xs.append(x)
-            zs.append(x + randn() * z_std)        
+            zs.append(x + randn() * z_std)
+        if save:
+            if not os.path.exists(DATA_DIR):
+                os.makedirs(DATA_DIR)
+            np.savetxt(SIG_FILE_NAME, np.array(zs).T, header="dt={0}".format(dt))
         return np.array(xs), np.array(zs)
+    
+    @staticmethod
+    def validate_signal(ctx, param, values):
+        """
+        """
+        if not values:
+            return
+        message = "\nThe arguments must be positive numbers in the "+\
+                  "following format:\nfloat var_z, float var_p, int l, float dt."
+        for v in values:
+            if(isinstance(v, numbers.Real) and v>=0):
+                pass
+            else:
+                raise click.BadParameter(message)
+        if(values[2]==0):
+            length = 1
+        else:
+            length = int(values[2])
+        if(values[3]==0.0):
+            dt = 1.0
+        else:
+            dt = values[3]
+        return [values[0], values[1], length, dt]
+
 
     @staticmethod
     def print_version(ctx, param, value):
@@ -88,13 +125,29 @@ class Utils:
             json.dump(settings, cfgfile)
 
     @staticmethod
-    def checkDimension(dim):
-        """Check if the dimension is a positive integer.
+    def checkPositiveInteger(value,
+                             message='The entered value '+
+                                     'must be a positive '+
+                                     'integer.'):
         """
-        message = 'The dimension must be a positive integer.'
-        if not isinstance(dim, numbers.Integral):
+        """
+        if not isinstance(value, numbers.Integral):
             raise ValueError(message)
         else:
-            if dim <= 0.0:
+            if value <= 0.0:
+                raise ValueError(message)
+        return True
+
+    @staticmethod
+    def checkPositiveReal(value,
+                          message='The entered value '+
+                                     'must be a positive '+
+                                     'real number.'):
+        """
+        """
+        if not isinstance(value, numbers.Real):
+            raise ValueError(message)
+        else:
+            if value <= 0.0:
                 raise ValueError(message)
         return True
