@@ -7,6 +7,7 @@ import click
 import json
 import math
 import numpy as np
+from datetime import date, datetime, timedelta
 from numpy.random import randn
 from unipath import Path
 from . import __version__
@@ -151,3 +152,27 @@ class Utils:
             if value <= 0.0:
                 raise ValueError(message)
         return True
+
+    @staticmethod
+    def generate_temperature_data(mu, sigma,
+                                  start,
+                                  end,
+                                  delta={'minutes':30}):
+        '''Simulated temperatures
+            param: mu mean
+            param: sigma standard deviation 
+        '''
+        data = {'timestamps':[], 'temperatures':[]}
+        for dt in Utils.datetime_range(start, end, delta):
+            data['timestamps'].append(dt)
+            data['temperatures'].append(np.random.normal(mu, sigma))
+        return data
+    
+    @staticmethod
+    def datetime_range(start, end, delta):
+        current = start
+        if not isinstance(delta, timedelta):
+            delta = timedelta(**delta)
+        while current < end:
+            yield current
+            current += delta

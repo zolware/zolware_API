@@ -2,7 +2,10 @@
 import os
 import click
 import numpy as np
+from datetime import datetime
 from .utils import BASE_DIR, DATA_DIR, CONFIG_FILE_NAME, SIG_FILE_NAME, Utils
+from .sensor import Sensor
+from .structure import Structure
 from .model import Model
 
 
@@ -25,6 +28,7 @@ from .model import Model
 def main(gui, config, reset, signal):
     """
     ZOLWARE: API for Structural Health Monitoring.
+             Input = structure
     """
     if not os.path.exists(CONFIG_FILE_NAME):
         # If the configuration file doesn't exist create one.
@@ -47,16 +51,35 @@ def main(gui, config, reset, signal):
         Utils.generateSignal(*signal, True)
         print("The data are saved in {0}.".format(SIG_FILE_NAME))
     else:  # compute and save the solution for the specified parameters.
-        m = Model()
-        sol = m.compute()
-        output = m.name+".txt"
+        # The server info  is stored in structure.server,
+        # a dictionary countaining the details and credentials
+        # to access the server data.
+        st1 = Structure({'serverInfo':[]}, 'Tamar bridge')
+        # data would eventually come from the redis database
+        # a celery worker would get the data from a server,
+        # e.g. scp, and update the redis database at a given 
+        # frequency. 
+        data = Utils.generate_temperature_data(10.0, 0.5,
+                                              datetime(2017,5,1),
+                                              datetime(2017,5,2))
+        se1 = Sensor('T1', 'temperature', 'K', data['temperatures'],
+                    location='Deck')
+        st1.add_sensor(se1)
+        st1.add_timestamps(data['timestamps'])
+        # The sensor and structure class are database models but
+        # we created dummy ones here to simulate them
+
+        #m = Model()
+        #sol = m.compute()
+        #output = m.name+".txt"
         # save the solution file
         try:
+            pass
             # save output
-            sim = m.sensors.signals[0]
-            exact = sol['xs'].T[0]
-            estimated = sol['xs'].T[1]
-            np.savetxt(DATA_DIR.child(output) , np.vstack((exact, sim, estimated)).T,
-                       header="exact    simulated    estimated")
+            #sim = m.signal.z[0]
+            #exact = sol['xs'].T[0]
+            #estimated = sol['xs'].T[1]
+            #np.savetxt(DATA_DIR.child(output) , np.vstack((exact, sim, estimated)).T,
+            #           header="exact    simulated    estimated")
         except:
             raise IOError("can't save the file")

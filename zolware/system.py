@@ -3,11 +3,12 @@ import numpy as np
 from .utils import Utils
 
 
-class Measurement:
+class System:
     """The Measurement class
+       Define the H and R matrices.
            :param dim: The dimension.
     """
-    def __init__(self, sensors):
+    def __init__(self):
         """The measurement mean z and covariance R
         are initialized here.
         """
