@@ -25,6 +25,7 @@ class Component:
     def learn_parameters(self):
         """scipy.optimize.newton
            likelihood can be obtained by filter.L
+           use the parameters class for the EM process
         """
         pass
 
